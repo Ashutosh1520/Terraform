@@ -1,0 +1,28 @@
+module "eks" {
+  source  = "terraform-aws-modules/eks/aws"
+  version = "21.1.5"
+  name = local.name
+  kubernetes_version = var.kubernetes_version
+  subnet_ids = module.vpc.private_subnets
+
+  enable_irsa = true
+
+  tags = {
+    cluster = "demo"
+  }
+
+  vpc_id = module.vpc.vpc_id
+
+  eks_managed_node_groups = {
+    default = {
+    
+    instance_types = ["t3.medium"]
+    ami_type = "AL2_x86_64"
+    vpc_security_group_ids = [aws_security_group.all_worker_mgmt.id]
+
+    min_size = 2
+    max_size = 6
+    desired_size = 2
+    }
+  }  
+}
